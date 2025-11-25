@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PawMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .user-avatar {
+            position: relative;
+        }
+        
+        .user-avatar::after {
+            content: '🐾';
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-link {
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background-color: rgba(251, 146, 60, 0.1);
+            border-left-color: #fb923c;
+            color: #fb923c;
+        }
+        
+        .pet-emoji-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .chart-bar {
+            transition: all 0.3s ease;
+        }
+        
+        .chart-bar:hover {
+            filter: brightness(1.1);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::after {
+            content: attr(data-emoji);
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.08;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
+        }
+        
+        .progress-step {
+            display: flex;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background-color: #e5e7eb;
+        }
+        
+        .progress-step:last-child::after {
+            display: none;
+        }
+        
+        .progress-step.active .step-circle {
+            background-color: #fb923c;
+            color: white;
+        }
+        
+        .progress-step.active ~ .progress-step::after {
+            background-color: #10b981;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-white shadow-xl">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-paw text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">PawMatch</h1>
+                        <p class="text-xs text-gray-500">Dashboard</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                        JD
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800" id="userName">John Doe</p>
+                        <p class="text-xs text-gray-500" id="userRole">Adopter</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="p-4 space-y-2">
+                <!-- Common Links -->
+                <button onclick="switchView('dashboard')" class="sidebar-link active w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <!-- Admin Only -->
+                <div id="adminNav">
+                    <p class="px-4 py-2 text-xs font-bold text-gray-400 uppercase">Administration</p>
+                    <button onclick="switchView('admin-stats')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span>Platform Stats</span>
+                    </button>
+                    <button onclick="switchView('manage-users')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Manage Users</span>
+                    </button>
+                    <button onclick="switchView('manage-applications')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-file-alt w-5"></i>
+                        <span>Applications</span>
+                    </button>
+                </div>
+
+                <!-- Shelter Only -->
+                <div id="shelterNav">
+                    <p class="px-4 py-2 text-xs font-bold text-gray-400 uppercase">Shelter</p>
+                    <button onclick="switchView('my-pets')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-list w-5"></i>
+                        <span>My Pets</span>
+                    </button>
+                    <button onclick="switchView('add-pet')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-plus-circle w-5"></i>
+                        <span>Add New Pet</span>
+                    </button>
+                    <button onclick="switchView('applications')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-inbox w-5"></i>
+                        <span>Applications</span>
+                    </button>
+                </div>
+
+                <!-- Adopter Only -->
+                <div id="adopterNav">
+                    <p class="px-4 py-2 text-xs font-bold text-gray-400 uppercase">My Activity</p>
+                    <button onclick="switchView('my-applications')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-heart w-5"></i>
+                        <span>My Applications</span>
+                    </button>
+                    <button onclick="switchView('favorites')" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3">
+                        <i class="fas fa-bookmark w-5"></i>
+                        <span>Favorites</span>
+                    </button>
+                </div>
+
+                <hr class="my-4">
+                <button onclick="logout()" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-red-600 hover:bg-red-50">
+                    <i class="fas fa-sign-out-alt w-5"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top Bar -->
+            <div class="bg-white shadow sticky top-0 z-40">
+                <div class="px-8 py-4 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800" id="pageTitle">Dashboard</h2>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-bell text-gray-600"></i>
+                        </button>
+                        <button class="p-2 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-cog text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-8">
+                <!-- Dashboard View -->
+                <div id="dashboard" class="view">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card rounded-xl p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Total Pets</p>
+                                    <p class="text-3xl font-bold text-gray-800 mt-2">1,240</p>
+                                </div>
+                                <i class="fas fa-paw text-orange-400 text-4xl opacity-20"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Adopted</p>
+                                    <p class="text-3xl font-bold text-green-600 mt-2">856</p>
+                                </div>
+                                <i class="fas fa-heart text-green-400 text-4xl opacity-20"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Available</p>
+                                    <p class="text-3xl font-bold text-blue-600 mt-2">384</p>
+                                </div>
+                                <i class="fas fa-home text-blue-400 text-4xl opacity-20"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card rounded-xl p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Happy Families</p>
+                                    <p class="text-3xl font-bold text-purple-600 mt-2">856</p>
+                                </div>
+                                <i class="fas fa-users text-purple-400 text-4xl opacity-20"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 text-center py-12">Welcome to your PawMatch Dashboard! Select a section from the sidebar to get started.</p>
+                </div>
+
+                <!-- Admin Stats View -->
+                <div id="admin-stats" class="view hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Platform Statistics -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Platform Statistics</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-700 font-semibold">Total Adoptions</span>
+                                        <span class="text-orange-600 font-bold">856</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3">
+                                        <div class="chart-bar bg-gradient-to-r from-orange-400 to-orange-600 h-3 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-700 font-semibold">Active Users</span>
+                                        <span class="text-blue-600 font-bold">2,340</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3">
+                                        <div class="chart-bar bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full" style="width: 94%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-700 font-semibold">Partner Shelters</span>
+                                        <span class="text-green-600 font-bold">324</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3">
+                                        <div class="chart-bar bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-700 font-semibold">Success Rate</span>
+                                        <span class="text-purple-600 font-bold">92%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-3">
+                                        <div class="chart-bar bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth Chart -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Monthly Growth</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-end space-x-2 h-48">
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 40%"></div>
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 50%"></div>
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 65%"></div>
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 55%"></div>
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 75%"></div>
+                                    <div class="chart-bar flex-1 bg-gradient-to-t from-orange-400 to-orange-500" style="height: 85%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500">
+                                    <span>Jun</span>
+                                    <span>Jul</span>
+                                    <span>Aug</span>
+                                    <span>Sep</span>
+                                    <span>Oct</span>
+                                    <span>Nov</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shelter - Add Pet Form -->
+                <div id="add-pet" class="view hidden">
+                    <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6">Add New Pet to Shelter</h3>
+                        <form class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pet Name *</label>
+                                    <input type="text" placeholder="Enter pet name" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pet Type *</label>
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                        <option>Select type...</option>
+                                        <option>Dog</option>
+                                        <option>Cat</option>
+                                        <option>Bird</option>
+                                        <option>Rabbit</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Breed *</label>
+                                    <input type="text" placeholder="Enter breed" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Age (years) *</label>
+                                    <input type="number" placeholder="0" min="0" max="50" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Gender *</label>
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                        <option>Select gender...</option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Color/Markings</label>
+                                    <input type="text" placeholder="e.g., Golden with white spots" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+                                <textarea placeholder="Tell us about this pet's personality and characteristics..." rows="5" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"></textarea>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-orange-500">
+                                        <span class="text-gray-700">Vaccinated</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-orange-500">
+                                        <span class="text-gray-700">Microchipped</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 pt-6">
+                                <button type="submit" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                    <i class="fas fa-save mr-2"></i>Add Pet
+                                </button>
+                                <button type="reset" class="px-8 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50">
+                                    Clear Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Adopter - Applications Status -->
+                <div id="my-applications" class="view hidden">
+                    <div class="space-y-6">
+                        <!-- Application 1 -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">Application for Max</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Golden Retriever • Applied on Nov 20, 2024</p>
+                                </div>
+                                <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full font-semibold text-sm">Pending Review</span>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="progress-step">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Submitted</p>
+                                </div>
+                                <div class="progress-step">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Screening</p>
+                                </div>
+                                <div class="progress-step active">
+                                    <div class="step-circle">
+                                        <i class="fas fa-clock text-orange-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Review</p>
+                                </div>
+                                <div class="progress-step">
+                                    <div class="step-circle">4</div>
+                                    <p class="text-xs text-gray-600 ml-2">Approved</p>
+                                </div>
+                            </div>
+
+                            <p class="text-gray-600 text-sm">Your application is being reviewed by the shelter. You should hear back within 2-3 business days.</p>
+                        </div>
+
+                        <!-- Application 2 -->
+                        <div class="bg-white rounded-xl shadow-md p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">Application for Luna</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Tabby Cat • Applied on Nov 15, 2024</p>
+                                </div>
+                                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full font-semibold text-sm">Approved</span>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="progress-step">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Submitted</p>
+                                </div>
+                                <div class="progress-step">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Screening</p>
+                                </div>
+                                <div class="progress-step">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Review</p>
+                                </div>
+                                <div class="progress-step active">
+                                    <div class="step-circle">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                    <p class="text-xs text-gray-600 ml-2">Approved</p>
+                                </div>
+                            </div>
+
+                            <p class="text-green-600 text-sm font-semibold">Congratulations! Your application has been approved. Please contact the shelter to arrange pickup.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Default Empty State -->
+                <div id="empty-state" class="view text-center py-12">
+                    <i class="fas fa-inbox text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-600 text-lg">This section is coming soon...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard based on role
+        let currentRole = 'adopter'; // Can be 'admin', 'shelter', or 'adopter'
+        let currentView = 'dashboard';
+        let currentUser = {
+            id: null,
+            name: 'Guest',
+            email: 'guest@example.com',
+            role: 'adopter'
+        };
+
+        function initializeDashboard() {
+            // Get user data from session storage
+            const userId = sessionStorage.getItem('userId');
+            const userRole = sessionStorage.getItem('userRole');
+            const userName = sessionStorage.getItem('userName');
+            const userEmail = sessionStorage.getItem('userEmail');
+            
+            // Check if user is logged in
+            if (!userId || !userRole) {
+                alert('Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Set current user
+            currentUser = {
+                id: userId,
+                name: userName || 'User',
+                email: userEmail || 'user@example.com',
+                role: userRole.toLowerCase()
+            };
+            
+            currentRole = currentUser.role;
+            
+            // Show/hide role-specific navigation
+            document.getElementById('adminNav').style.display = currentRole === 'admin' ? 'block' : 'none';
+            document.getElementById('shelterNav').style.display = currentRole === 'shelter' ? 'block' : 'none';
+            document.getElementById('adopterNav').style.display = currentRole === 'adopter' ? 'block' : 'none';
+
+            // Set user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = {
+                'admin': 'Administrator',
+                'shelter': 'Shelter Manager',
+                'adopter': 'Pet Adopter'
+            }[currentUser.role] || 'User';
+            
+            // Initialize sidebar active state
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-link')[0]?.classList.add('active');
+        }
+
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.add('hidden');
+            });
+
+            // Show selected view
+            const view = document.getElementById(viewName);
+            if (view) {
+                view.classList.remove('hidden');
+            } else {
+                document.getElementById('empty-state').classList.remove('hidden');
+            }
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.sidebar-link')?.classList.add('active');
+
+            // Update page title
+            const titles = {
+                dashboard: 'Dashboard',
+                'admin-stats': 'Platform Statistics',
+                'manage-users': 'Manage Users',
+                'manage-applications': 'Review Applications',
+                'my-pets': 'My Pets',
+                'add-pet': 'Add New Pet',
+                applications: 'Adoption Applications',
+                'my-applications': 'My Applications',
+                favorites: 'My Favorite Pets'
+            };
+
+            document.getElementById('pageTitle').textContent = titles[viewName] || 'Dashboard';
+            currentView = viewName;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear session storage
+                sessionStorage.removeItem('userId');
+                sessionStorage.removeItem('userRole');
+                sessionStorage.removeItem('userName');
+                sessionStorage.removeItem('userEmail');
+                
+                // Redirect to home
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+
+</body>
+</html>

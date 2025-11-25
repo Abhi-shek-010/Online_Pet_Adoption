@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Pets - PawMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes petFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        
+        .pet-card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .pet-card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(251, 146, 60, 0.4);
+        }
+        
+        .pet-image-container {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+        
+        .pet-image {
+            font-size: 80px;
+            animation: petFloat 3s ease-in-out infinite;
+        }
+        
+        .pet-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.3s ease;
+        }
+        
+        .pet-card-hover:hover .pet-card-overlay {
+            background: rgba(251, 146, 60, 0.1);
+        }
+        
+        .filter-badge {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-badge.active {
+            background-color: #fb923c;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
+        }
+        
+        .search-input {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.href='index.html'">
+                    <i class="fas fa-paw text-orange-500 text-2xl"></i>
+                    <span class="text-2xl font-bold text-gray-800">PawMatch</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-orange-500 transition">Home</a>
+                    <a href="#" class="text-orange-500 font-semibold">Browse Pets</a>
+                    <a href="index.html#stories" class="text-gray-600 hover:text-orange-500 transition">Success Stories</a>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="window.location.href='dashboard.html'" class="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-50 transition">Dashboard</button>
+                    <button onclick="logout()" class="px-4 py-2 btn-primary text-white rounded-lg">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Browse Available Pets</h1>
+            <p class="text-lg text-gray-600">Find your perfect companion from our selection of wonderful animals</p>
+        </div>
+
+        <!-- Filters Sidebar -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Filters</h3>
+
+                    <!-- Pet Type -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Pet Type</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="petType" class="w-4 h-4 text-orange-500" onclick="filterPets()" checked>
+                                <span class="ml-3 text-gray-700">All Types</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="petType" value="dog" class="w-4 h-4 text-orange-500" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Dogs</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="petType" value="cat" class="w-4 h-4 text-orange-500" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Cats</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="petType" value="bird" class="w-4 h-4 text-orange-500" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Birds</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Gender</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-orange-500 rounded" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Male</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-orange-500 rounded" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Female</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Vaccination Status -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Vaccination</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-orange-500 rounded" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Vaccinated</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-orange-500 rounded" onclick="filterPets()">
+                                <span class="ml-3 text-gray-700">Microchipped</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Age Range -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Age Range</label>
+                        <input type="range" min="0" max="15" class="w-full" onchange="filterPets()">
+                        <div class="flex justify-between text-xs text-gray-600 mt-2">
+                            <span>0 years</span>
+                            <span>15+ years</span>
+                        </div>
+                    </div>
+
+                    <button onclick="resetFilters()" class="w-full mt-6 px-4 py-2 border-2 border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 transition font-semibold">
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pet Grid -->
+            <div class="lg:col-span-3">
+                <div id="petGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pet Card 1 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('max')">
+                        <div class="pet-image-container h-40 flex items-center justify-center relative">
+                            <div class="pet-image">🐕</div>
+                            <div class="pet-card-overlay"></div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Max</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>Golden Retriever</span>
+                                <span><i class="fas fa-mars text-blue-500 mr-1"></i>Male</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Friendly, energetic, and loves outdoor activities. Perfect for families!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('max', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 2 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('luna')">
+                        <div class="pet-image-container h-40 flex items-center justify-center relative bg-gradient-to-br from-pink-200 to-rose-300">
+                            <div class="pet-image" style="animation-delay: 0.3s;">🐈</div>
+                            <div class="pet-card-overlay"></div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Luna</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>Tabby Cat</span>
+                                <span><i class="fas fa-venus text-pink-500 mr-1"></i>Female</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Gentle, affectionate, and independent. Great for apartment living!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('luna', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 3 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('buddy')">
+                        <div class="pet-image-container h-40 flex items-center justify-center relative bg-gradient-to-br from-blue-200 to-blue-400">
+                            <div class="pet-image" style="animation-delay: 0.6s;">🐶</div>
+                            <div class="pet-card-overlay"></div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Buddy</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>Beagle</span>
+                                <span><i class="fas fa-mars text-blue-500 mr-1"></i>Male</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Playful, curious, and great with kids. Always ready for an adventure!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('buddy', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 4 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('charlie')">
+                        <div class="pet-image-container h-40 flex items-center justify-center relative bg-gradient-to-br from-yellow-200 to-yellow-400">
+                            <div class="pet-image" style="animation-delay: 0.9s;">🦜</div>
+                            <div class="pet-card-overlay"></div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Charlie</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>Canary</span>
+                                <span><i class="fas fa-mars text-blue-500 mr-1"></i>Male</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Beautiful songbird with bright plumage. Low-maintenance and cheerful!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Healthy</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('charlie', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 5 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('whiskers')">
+                        <div class="pet-image-container h-40 flex items-center justify-center relative bg-gradient-to-br from-gray-300 to-gray-500">
+                            <div class="pet-image" style="animation-delay: 0.4s;">😺</div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Whiskers</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>Persian Cat</span>
+                                <span><i class="fas fa-venus text-pink-500 mr-1"></i>Female</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Elegant, calm, and loves being pampered. Perfect for quiet homes!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('whiskers', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pet Card 6 -->
+                    <div class="pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card" onclick="viewPetDetails('rocky')">
+                        <div class="bg-gradient-to-br from-red-200 to-red-400 h-40 flex items-center justify-center">
+                            <i class="fas fa-dog text-5xl text-white opacity-80"></i>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Rocky</h3>
+                            <div class="flex justify-between text-sm text-gray-600 mb-3">
+                                <span><i class="fas fa-dna text-orange-500 mr-1"></i>German Shepherd</span>
+                                <span><i class="fas fa-mars text-blue-500 mr-1"></i>Male</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">Loyal, intelligent, and protective. Excellent family companion!</p>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>
+                            </div>
+                            <button onclick="adoptPet('rocky', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                                <i class="fas fa-heart mr-1"></i>Adopt Me
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More Button -->
+                <div class="text-center mt-12">
+                    <button class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                        Load More Pets <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 PawMatch. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let allPets = [];
+        
+        function loadPets() {
+            // Check if user is logged in
+            const userId = sessionStorage.getItem('userId');
+            if (!userId) {
+                console.log('No user logged in, showing demo pets');
+            }
+            
+            // Fetch pets from backend
+            fetch('/online-pet-adoption/pets')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allPets = data.pets || [];
+                        displayPets(allPets);
+                    } else {
+                        console.log('Using demo pets');
+                        displayDemoPets();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading pets:', error);
+                    displayDemoPets();
+                });
+        }
+        
+        function displayDemoPets() {
+            const demoPets = [
+                { id: 1, name: 'Max', breed: 'Golden Retriever', gender: 'Male', vaccinated: true, available: true, type: 'dog', icon: 'fa-dog', color: 'amber' },
+                { id: 2, name: 'Luna', breed: 'Tabby Cat', gender: 'Female', vaccinated: true, available: true, type: 'cat', icon: 'fa-cat', color: 'pink' },
+                { id: 3, name: 'Buddy', breed: 'Beagle', gender: 'Male', vaccinated: true, available: true, type: 'dog', icon: 'fa-dog', color: 'blue' },
+                { id: 4, name: 'Charlie', breed: 'Canary', gender: 'Male', vaccinated: false, available: true, type: 'bird', icon: 'fa-feather', color: 'yellow' },
+                { id: 5, name: 'Whiskers', breed: 'Persian Cat', gender: 'Female', vaccinated: true, available: true, type: 'cat', icon: 'fa-cat', color: 'gray' },
+                { id: 6, name: 'Rocky', breed: 'German Shepherd', gender: 'Male', vaccinated: true, available: true, type: 'dog', icon: 'fa-dog', color: 'red' }
+            ];
+            displayPets(demoPets);
+        }
+        
+        function displayPets(pets) {
+            const petGrid = document.getElementById('petGrid');
+            petGrid.innerHTML = '';
+            
+            pets.forEach(pet => {
+                const colors = {
+                    'amber': 'from-amber-200 to-orange-300',
+                    'pink': 'from-pink-200 to-rose-300',
+                    'blue': 'from-blue-200 to-blue-400',
+                    'yellow': 'from-yellow-200 to-yellow-400',
+                    'gray': 'from-gray-300 to-gray-500',
+                    'red': 'from-red-200 to-red-400'
+                };
+                
+                const card = document.createElement('div');
+                card.className = 'pet-card-hover bg-white rounded-xl shadow-md overflow-hidden pet-card';
+                card.innerHTML = `
+                    <div class="bg-gradient-to-br ${colors[pet.color] || 'from-orange-200 to-orange-300'} h-40 flex items-center justify-center">
+                        <i class="fas ${pet.icon} text-5xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">${pet.name}</h3>
+                        <div class="flex justify-between text-sm text-gray-600 mb-3">
+                            <span><i class="fas fa-dna text-orange-500 mr-1"></i>${pet.breed}</span>
+                            <span><i class="fas fa-${pet.gender === 'Male' ? 'mars' : 'venus'} text-${pet.gender === 'Male' ? 'blue' : 'pink'}-500 mr-1"></i>${pet.gender}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">A wonderful ${pet.type} looking for a loving home!</p>
+                        <div class="flex gap-2 mb-4">
+                            ${pet.vaccinated ? '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">Vaccinated</span>' : ''}
+                            ${pet.available ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">Available</span>' : '<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-semibold">Adopted</span>'}
+                        </div>
+                        <button onclick="adoptPet('${pet.id}', event)" class="btn-primary w-full text-white py-2 rounded-lg font-semibold text-sm">
+                            <i class="fas fa-heart mr-1"></i>Adopt Me
+                        </button>
+                    </div>
+                `;
+                petGrid.appendChild(card);
+            });
+        }
+
+        function filterPets() {
+            console.log('Filters applied');
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+            document.querySelector('input[type="radio"]').checked = true;
+            displayPets(allPets);
+        }
+
+        function viewPetDetails(petId) {
+            console.log('Viewing pet details for: ' + petId);
+            alert('Pet details for ' + petId + ' - Feature to be implemented');
+        }
+
+        function adoptPet(petId, event) {
+            event.stopPropagation();
+            
+            const userId = sessionStorage.getItem('userId');
+            if (!userId) {
+                alert('Please login first to submit an adoption application');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Submit adoption application
+            fetch('/online-pet-adoption/pets/' + petId + '/adopt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Adoption application submitted successfully!');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Error: ' + (data.message || 'Could not submit application'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Starting adoption process for pet ' + petId + '!');
+            });
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // Load pets on page load
+        window.addEventListener('DOMContentLoaded', loadPets);
+    </script>
+
+</body>
+</html>

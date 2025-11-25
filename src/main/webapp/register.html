@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - PawMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .auth-container {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-container::before {
+            content: '🐕 🐈 🐇 🐕 🐈';
+            position: absolute;
+            top: 10%;
+            left: -5%;
+            font-size: 100px;
+            opacity: 0.15;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .auth-container::after {
+            content: '🦮 🐕‍🦺 🐩 🦮 🐕‍🦺';
+            position: absolute;
+            bottom: 5%;
+            right: -10%;
+            font-size: 100px;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite 1s;
+            pointer-events: none;
+        }
+        
+        .form-input {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
+        }
+        
+        .password-strength {
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+        
+        .password-toggle:hover {
+            color: #fb923c;
+        }
+        
+        .role-card {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            border-color: #fb923c;
+        }
+        
+        .role-card.selected {
+            border-color: #fb923c;
+            background: rgba(251, 146, 60, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Left Side - Features -->
+        <div class="auth-container w-1/2 text-white flex flex-col justify-center items-center p-12">
+            <div class="text-center z-10 max-w-md">
+                <div class="mb-6 text-6xl">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">Join PawMatch</h1>
+                <p class="text-lg text-gray-100 mb-8">Be part of a community dedicated to finding loving homes for pets in need</p>
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-star text-yellow-300 text-lg"></i>
+                        <span>Browse thousands of adorable pets</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-star text-yellow-300 text-lg"></i>
+                        <span>Submit adoption applications easily</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-star text-yellow-300 text-lg"></i>
+                        <span>Connect with shelters and rescues</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Registration Form -->
+        <div class="w-1/2 flex flex-col justify-center items-center p-12 bg-white overflow-y-auto">
+            <div class="max-w-md w-full">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Create Account</h2>
+                    <p class="text-gray-600">Join us and find your perfect pet friend</p>
+                </div>
+
+                <form class="space-y-5" onsubmit="handleRegister(event)">
+                    <!-- Role Selection -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">I'm a...</label>
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div class="role-card rounded-lg p-4 text-center transition" onclick="selectRole('ADOPTER', this)">
+                                <i class="fas fa-heart text-orange-500 text-2xl mb-2 block"></i>
+                                <span class="text-xs font-semibold text-gray-700">Pet Adopter</span>
+                            </div>
+                            <div class="role-card rounded-lg p-4 text-center transition" onclick="selectRole('SHELTER', this)">
+                                <i class="fas fa-home text-orange-500 text-2xl mb-2 block"></i>
+                                <span class="text-xs font-semibold text-gray-700">Shelter/Rescue</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="userRole" value="">
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullName"
+                            placeholder="John Doe" 
+                            class="form-input w-full px-4 py-3 rounded-lg"
+                            required
+                        >
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email"
+                            placeholder="you@example.com" 
+                            class="form-input w-full px-4 py-3 rounded-lg"
+                            required
+                        >
+                    </div>
+
+                    <!-- Phone (Shelter/Admin) -->
+                    <div id="phoneField" class="hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            id="phone"
+                            placeholder="(555) 123-4567" 
+                            class="form-input w-full px-4 py-3 rounded-lg"
+                        >
+                    </div>
+
+                    <!-- Organization (Shelter/Admin) -->
+                    <div id="orgField" class="hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Organization Name</label>
+                        <input 
+                            type="text" 
+                            id="organization"
+                            placeholder="Your Shelter/Organization" 
+                            class="form-input w-full px-4 py-3 rounded-lg"
+                        >
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                placeholder="••••••••" 
+                                class="form-input w-full px-4 py-3 rounded-lg pr-10"
+                                oninput="checkPasswordStrength()"
+                                required
+                            >
+                            <span class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="password-strength">
+                            <div id="strengthBar" class="password-strength-bar bg-red-500"></div>
+                        </div>
+                        <p id="strengthText" class="text-xs text-red-500 mt-1">Weak password</p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                placeholder="••••••••" 
+                                class="form-input w-full px-4 py-3 rounded-lg pr-10"
+                                required
+                            >
+                            <span class="password-toggle" onclick="toggleConfirmPassword()">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start space-x-2">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            class="w-4 h-4 text-orange-500 rounded mt-1"
+                            required
+                        >
+                        <label for="terms" class="text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-orange-600 font-semibold hover:underline">Terms of Service</a> and <a href="#" class="text-orange-600 font-semibold hover:underline">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button 
+                        type="submit" 
+                        class="btn-primary w-full text-white font-bold py-3 rounded-lg mt-6"
+                    >
+                        Create Account
+                    </button>
+                </form>
+
+                <!-- Login Link -->
+                <p class="text-center text-gray-600 mt-6">
+                    Already have an account? 
+                    <a href="login.html" class="text-orange-600 font-bold hover:text-orange-700">
+                        Sign in
+                    </a>
+                </p>
+
+                <!-- Footer -->
+                <div class="text-center mt-6 pt-6 border-t border-gray-200">
+                    <a href="index.html" class="text-gray-600 hover:text-orange-600 transition text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectRole(role, element) {
+            // Update hidden input
+            document.getElementById('userRole').value = role;
+
+            // Update UI
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Show/hide role-specific fields
+            const phoneField = document.getElementById('phoneField');
+            const orgField = document.getElementById('orgField');
+
+            if (role === 'adopter') {
+                phoneField.classList.add('hidden');
+                orgField.classList.add('hidden');
+            } else {
+                phoneField.classList.remove('hidden');
+                orgField.classList.remove('hidden');
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = event.target.closest('.password-toggle').querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function toggleConfirmPassword() {
+            const confirmInput = document.getElementById('confirmPassword');
+            const icon = event.target.closest('.password-toggle').querySelector('i');
+            
+            if (confirmInput.type === 'password') {
+                confirmInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                confirmInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[!@#$%^&*]/.test(password)) strength++;
+
+            const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
+            const labels = ['Weak password', 'Fair password', 'Good password', 'Strong password'];
+            const widths = ['25%', '50%', '75%', '100%'];
+
+            strengthBar.className = `password-strength-bar ${colors[strength]}`;
+            strengthBar.style.width = widths[strength];
+            strengthText.textContent = labels[strength];
+            strengthText.className = strength < 3 
+                ? 'text-xs text-red-500 mt-1' 
+                : 'text-xs text-green-500 mt-1';
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+
+            const role = document.getElementById('userRole').value;
+            if (!role) {
+                alert('Please select your role');
+                return;
+            }
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const phone = document.getElementById('phone').value.trim();
+            const organization = document.getElementById('organization').value.trim();
+
+            if (!fullName || !email || !password || !confirmPassword) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+
+            // Send registration to backend
+            const registrationData = {
+                username: fullName,
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword,
+                role: role,
+                phone: phone || '',
+                organization: organization || ''
+            };
+
+            fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registrationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Account created successfully! Please login with your credentials.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Registration failed: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Registration error: ' + error.message);
+            });
+        }
+    </script>
+
+</body>
+</html>

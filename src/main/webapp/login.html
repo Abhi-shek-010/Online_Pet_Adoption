@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PawMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pawPrint {
+            0% { opacity: 0.1; transform: scale(0.5); }
+            50% { opacity: 0.3; }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+        
+        .auth-container {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-container::before {
+            content: '🐾 🐾 🐾 🐾 🐾';
+            position: absolute;
+            top: 10%;
+            left: -10%;
+            font-size: 120px;
+            opacity: 0.15;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .auth-container::after {
+            content: '🐾 🐾 🐾 🐾 🐾';
+            position: absolute;
+            bottom: -5%;
+            right: -15%;
+            font-size: 140px;
+            opacity: 0.12;
+            animation: float 8s ease-in-out infinite 1s;
+            pointer-events: none;
+        }
+        
+        .pet-accent {
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.08;
+            animation: float 7s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .pet-accent-1 { top: 30%; right: 5%; animation-delay: 0s; }
+        .pet-accent-2 { bottom: 20%; left: 10%; animation-delay: 2s; }
+        .pet-accent-3 { top: 60%; right: 15%; animation-delay: 1s; }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-input {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+        
+        .password-toggle:hover {
+            color: #fb923c;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Left Side - Branding -->
+        <div class="auth-container w-1/2 text-white flex flex-col justify-center items-center p-12">
+            <div class="text-center z-10 max-w-md">
+                <div class="mb-6 text-6xl">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">PawMatch</h1>
+                <p class="text-lg text-gray-100 mb-8">Find your perfect pet companion and give them a loving home</p>
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
+                        <span>Thousands of pets waiting for homes</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
+                        <span>Trusted by pet lovers everywhere</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
+                        <span>Simple and secure adoption process</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="w-1/2 flex flex-col justify-center items-center p-12 bg-white">
+            <div class="max-w-md w-full">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
+                    <p class="text-gray-600">Sign in to your PawMatch account</p>
+                </div>
+
+                <form class="space-y-5" onsubmit="handleLogin(event)">
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            placeholder="you@example.com" 
+                            class="form-input w-full px-4 py-3 rounded-lg"
+                            required
+                        >
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                placeholder="••••••••" 
+                                class="form-input w-full px-4 py-3 rounded-lg pr-10"
+                                required
+                            >
+                            <span class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Remember & Forgot -->
+                    <div class="flex justify-between items-center">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 text-orange-500 rounded">
+                            <span class="text-sm text-gray-700">Remember me</span>
+                        </label>
+                        <a href="#" class="text-sm text-orange-600 hover:text-orange-700 font-semibold">Forgot password?</a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button 
+                        type="submit" 
+                        class="btn-primary w-full text-white font-bold py-3 rounded-lg mt-6"
+                    >
+                        Sign In
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or continue as</span>
+                    </div>
+                </div>
+
+                <!-- Demo Roles -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button 
+                        type="button"
+                        onclick="demoLogin('admin')"
+                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
+                    >
+                        <i class="fas fa-crown mr-1"></i>Admin
+                    </button>
+                    <button 
+                        type="button"
+                        onclick="demoLogin('shelter')"
+                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
+                    >
+                        <i class="fas fa-home mr-1"></i>Shelter
+                    </button>
+                    <button 
+                        type="button"
+                        onclick="demoLogin('adopter')"
+                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
+                    >
+                        <i class="fas fa-heart mr-1"></i>Adopter
+                    </button>
+                </div>
+
+                <!-- Sign Up Link -->
+                <p class="text-center text-gray-600">
+                    Don't have an account? 
+                    <a href="register.html" class="text-orange-600 font-bold hover:text-orange-700">
+                        Create one now
+                    </a>
+                </p>
+
+                <!-- Footer -->
+                <div class="text-center mt-8 pt-6 border-t border-gray-200">
+                    <a href="index.html" class="text-gray-600 hover:text-orange-600 transition text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = event.target.closest('.password-toggle').querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.querySelector('input[type="email"]').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            // Send login request to backend
+            const loginData = {
+                email: email,
+                password: password
+            };
+
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Store user data in session storage
+                    sessionStorage.setItem('userId', data.userId);
+                    sessionStorage.setItem('userRole', data.role);
+                    sessionStorage.setItem('userName', data.username);
+                    sessionStorage.setItem('userEmail', data.email);
+                    
+                    console.log('Login successful:', data);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Login failed: ' + (data.message || 'Invalid credentials'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Login error: ' + error.message);
+            });
+        }
+
+        function demoLogin(role) {
+            let credentials = {};
+            
+            if (role === 'admin') {
+                credentials = { email: 'admin', password: 'admin@123' };
+            } else if (role === 'shelter') {
+                credentials = { email: 'shelter@example.com', password: 'Shelter@123' };
+            } else if (role === 'adopter') {
+                credentials = { email: 'adopter@example.com', password: 'Adopter@123' };
+            }
+            
+            // Simulate demo login
+            sessionStorage.setItem('userId', Math.floor(Math.random() * 1000));
+            sessionStorage.setItem('userRole', role.toUpperCase());
+            sessionStorage.setItem('userName', role === 'admin' ? 'Admin Account' : role === 'shelter' ? 'Happy Paws Shelter' : 'Demo Adopter');
+            sessionStorage.setItem('userEmail', credentials.email);
+            
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    
+    <!-- ============================================ -->
+    <!-- Application Name and Description -->
+    <!-- ============================================ -->
+    <display-name>Pet Adoption System</display-name>
+    <description>Online Pet Adoption Platform - Web Application Configuration</description>
+    
+    <!-- ============================================ -->
+    <!-- Context Parameters -->
+    <!-- ============================================ -->
+    <context-param>
+        <param-name>database.url</param-name>
+        <param-value>jdbc:mysql://localhost:3306/pet_adoption_system</param-value>
+    </context-param>
+    <context-param>
+        <param-name>database.user</param-name>
+        <param-value>root</param-value>
+    </context-param>
+    <context-param>
+        <param-name>database.password</param-name>
+        <param-value>root</param-value>
+    </context-param>
+    
+    <!-- ============================================ -->
+    <!-- Servlet Configuration - AuthServlet -->
+    <!-- ============================================ -->
+    <!-- 
+    AUTHENTICATION SERVLET
+    Purpose: Handle user login, registration, and logout
+    Features:
+    - Session management for authenticated users
+    - Role-based access control (ADMIN, SHELTER, ADOPTER)
+    - Password hashing and verification
+    - Comprehensive exception handling
+    
+    URL Patterns:
+    - POST /auth/login - User login
+    - POST /auth/register - User registration
+    - GET /auth/logout - User logout
+    -->
+    <servlet>
+        <servlet-name>AuthServlet</servlet-name>
+        <servlet-class>com.petadoption.servlet.AuthServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <init-param>
+            <param-name>allowedRoles</param-name>
+            <param-value>ADMIN,SHELTER,ADOPTER</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/auth/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/auth/register</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/auth/logout</url-pattern>
+    </servlet-mapping>
+    
+    <!-- ============================================ -->
+    <!-- Servlet Configuration - PetServlet -->
+    <!-- ============================================ -->
+    <!-- 
+    PET MANAGEMENT SERVLET
+    Purpose: Handle pet-related operations with role-based access
+    Features:
+    - Shelters can POST new pets
+    - Adopters can GET available pets
+    - Admins can manage all pets
+    - Advanced filtering and search
+    
+    URL Patterns:
+    - GET /pets - Get available pets
+    - GET /pets/{petId} - Get pet details
+    - POST /pets - Create new pet (Shelters/Admins)
+    - PUT /pets/{petId} - Update pet (Shelters/Admins)
+    - DELETE /pets/{petId} - Delete pet (Admins)
+    -->
+    <servlet>
+        <servlet-name>PetServlet</servlet-name>
+        <servlet-class>com.petadoption.servlet.PetServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+        <init-param>
+            <param-name>allowedRoles</param-name>
+            <param-value>ADMIN,SHELTER,ADOPTER</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>PetServlet</servlet-name>
+        <url-pattern>/pets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PetServlet</servlet-name>
+        <url-pattern>/pets/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- ============================================ -->
+    <!-- Session Configuration -->
+    <!-- ============================================ -->
+    <!-- 
+    Session timeout: 30 minutes of inactivity
+    -->
+    <session-config>
+        <cookie-config>
+            <secure>true</secure>
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+    
+    <!-- ============================================ -->
+    <!-- Filters (For Future Use) -->
+    <!-- ============================================ -->
+    <!-- 
+    Authentication Filter - Can be implemented to protect servlets
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>com.petadoption.filter.AuthenticationFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/pets/*</url-pattern>
+    </filter-mapping>
+    -->
+    
+    <!-- ============================================ -->
+    <!-- Error Pages -->
+    <!-- ============================================ -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/404.html</location>
+    </error-page>
+    
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/500.html</location>
+    </error-page>
+    
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error/500.html</location>
+    </error-page>
+    
+    <!-- ============================================ -->
+    <!-- Welcome Files -->
+    <!-- ============================================ -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+    
+    <!-- ============================================ -->
+    <!-- Servlet 4.0 Features -->
+    <!-- ============================================ -->
+    <metadata-complete>false</metadata-complete>
+    
+</web-app>

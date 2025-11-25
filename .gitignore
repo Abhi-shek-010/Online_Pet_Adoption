@@ -1,0 +1,96 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+.classpath
+.project
+.settings/
+*.log
+
+# Build
+*.o
+*.so
+*.exe
+*.dll
+*.dylib
+*.jnilib
+*.a
+*.lib
+
+# Environment
+.env
+.env.local
+.env.*.local
+.gradle
+.m2
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Runtime
+target/
+node_modules/
+dist/
+build/
+
+# IntelliJ
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.settings
+.classpath
+.project
+
+# NetBeans
+.nb-gradle
+
+# Visual Studio Code
+.vscode/
+
+# Git
+.git/
+
+# Temporary
+*.tmp
+*.bak
+*.swp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Application specific
+logs/
+*.log
+uploads/
+temp/
+cache/
