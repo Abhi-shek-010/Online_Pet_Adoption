@@ -1,319 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PawMatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        body {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
         }
-        
-        @keyframes pawPrint {
-            0% { opacity: 0.1; transform: scale(0.5); }
-            50% { opacity: 0.3; }
-            100% { opacity: 0; transform: scale(1.5); }
-        }
-        
-        .auth-container {
-            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .auth-container::before {
-            content: '🐾 🐾 🐾 🐾 🐾';
+
+        canvas {
             position: absolute;
-            top: 10%;
-            left: -10%;
-            font-size: 120px;
-            opacity: 0.15;
-            animation: float 6s ease-in-out infinite;
-            pointer-events: none;
-        }
-        
-        .auth-container::after {
-            content: '🐾 🐾 🐾 🐾 🐾';
-            position: absolute;
-            bottom: -5%;
-            right: -15%;
-            font-size: 140px;
-            opacity: 0.12;
-            animation: float 8s ease-in-out infinite 1s;
-            pointer-events: none;
-        }
-        
-        .pet-accent {
-            position: absolute;
-            font-size: 80px;
-            opacity: 0.08;
-            animation: float 7s ease-in-out infinite;
-            pointer-events: none;
-        }
-        
-        .pet-accent-1 { top: 30%; right: 5%; animation-delay: 0s; }
-        .pet-accent-2 { bottom: 20%; left: 10%; animation-delay: 2s; }
-        .pet-accent-3 { top: 60%; right: 15%; animation-delay: 1s; }
-        
-        .form-group {
-            position: relative;
-        }
-        
-        .form-input {
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            border-color: #fb923c;
-            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+            top: 0;
+            left: 0;
             outline: none;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-            transition: all 0.3s ease;
+
+        .input-group {
+            position: relative;
         }
-        
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
+
+        /* Reduced Motion / Softer interactions */
+        .input-group input:focus+label,
+        .input-group input:not(:placeholder-shown)+label {
+            transform: translateY(-24px) scale(0.9);
+            /* Reduced scale */
+            color: #ea580c;
         }
-        
-        .password-toggle {
-            cursor: pointer;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            transition: color 0.2s;
+
+        .soft-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
-        .password-toggle:hover {
-            color: #fb923c;
+
+        .soft-hover:hover {
+            transform: translateY(-1px);
+            /* Reduced movement */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="flex min-h-screen">
-        <!-- Left Side - Branding -->
-        <div class="auth-container w-1/2 text-white flex flex-col justify-center items-center p-12">
-            <div class="text-center z-10 max-w-md">
-                <div class="mb-6 text-6xl">
-                    <i class="fas fa-paw"></i>
+
+<body class="h-screen w-full bg-orange-50 overflow-hidden text-slate-800">
+
+    <div class="flex h-full">
+        <!-- Left Side: 3D Branding -->
+        <div class="hidden lg:flex w-1/2 relative bg-gray-900 items-center justify-center overflow-hidden">
+            <div id="canvas-container" class="absolute inset-0 z-0"></div> <!-- Canvas Mount -->
+
+            <div class="relative z-10 text-center px-12 text-white max-w-lg">
+                <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl animate-bounce"
+                    style="animation-duration: 3s;">
+                    <i class="fas fa-paw text-5xl text-orange-400"></i>
                 </div>
-                <h1 class="text-4xl font-bold mb-4">PawMatch</h1>
-                <p class="text-lg text-gray-100 mb-8">Find your perfect pet companion and give them a loving home</p>
-                <div class="space-y-4 text-sm">
-                    <div class="flex items-center space-x-3">
-                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
-                        <span>Thousands of pets waiting for homes</span>
+                <h1 class="text-6xl font-extrabold mb-6 tracking-tight">PawMatch</h1>
+                <p class="text-xl text-gray-300 font-light leading-relaxed">
+                    Join thousands of happy families. <br>
+                    <span class="text-orange-400 font-medium">Find your new best friend today.</span>
+                </p>
+
+                <div class="mt-12 flex justify-center gap-4">
+                    <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                        <i class="fas fa-check-circle text-green-400"></i> Trusted
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
-                        <span>Trusted by pet lovers everywhere</span>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <i class="fas fa-check-circle text-green-300 text-lg"></i>
-                        <span>Simple and secure adoption process</span>
+                    <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                        <i class="fas fa-heart text-red-400"></i> Loving
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Side - Login Form -->
-        <div class="w-1/2 flex flex-col justify-center items-center p-12 bg-white">
-            <div class="max-w-md w-full">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
-                    <p class="text-gray-600">Sign in to your PawMatch account</p>
-                </div>
+        <!-- Right Side: Login Form -->
+        <div class="w-full lg:w-1/2 relative flex items-center justify-center bg-white">
+            <div class="absolute inset-0 z-0 bg-grid-slate-100 opacity-20"></div>
 
-                <form class="space-y-5" onsubmit="handleLogin(event)">
-                    <!-- Email -->
-                    <div class="form-group">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                        <input 
-                            type="email" 
-                            placeholder="you@example.com" 
-                            class="form-input w-full px-4 py-3 rounded-lg"
-                            required
-                        >
+            <div class="relative z-10 w-full max-w-md px-8">
+                <div class="mb-10 text-center lg:text-left">
+                    <div class="inline-flex lg:hidden items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white"><i
+                                class="fas fa-paw"></i></div>
+                        <span class="text-xl font-bold">PawMatch</span>
                     </div>
 
-                    <!-- Password -->
-                    <div class="form-group">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Welcome Back</h2>
+                    <p class="text-gray-500">Sign in to manage your adoptions.</p>
+                </div>
+
+                <form class="space-y-6" onsubmit="handleLogin(event)">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Email Address</label>
                         <div class="relative">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                placeholder="••••••••" 
-                                class="form-input w-full px-4 py-3 rounded-lg pr-10"
-                                required
-                            >
-                            <span class="password-toggle" onclick="togglePassword()">
-                                <i class="fas fa-eye"></i>
-                            </span>
+                            <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="email" placeholder="name@example.com"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-500 outline-none transition-all"
+                                required>
                         </div>
                     </div>
 
-                    <!-- Remember & Forgot -->
-                    <div class="flex justify-between items-center">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" class="w-4 h-4 text-orange-500 rounded">
-                            <span class="text-sm text-gray-700">Remember me</span>
-                        </label>
-                        <a href="#" class="text-sm text-orange-600 hover:text-orange-700 font-semibold">Forgot password?</a>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <label class="text-sm font-bold text-gray-700">Password</label>
+                            <a href="#" class="text-sm text-orange-600 font-semibold hover:underline">Forgot?</a>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="password" id="password" placeholder="••••••••"
+                                class="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-500 outline-none transition-all"
+                                required>
+                            <button type="button" onclick="togglePassword()"
+                                class="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Login Button -->
-                    <button 
-                        type="submit" 
-                        class="btn-primary w-full text-white font-bold py-3 rounded-lg mt-6"
-                    >
+                    <button type="submit"
+                        class="w-full py-3.5 bg-orange-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-orange-500/20 hover:bg-orange-700 soft-hover">
                         Sign In
                     </button>
                 </form>
 
-                <!-- Divider -->
-                <div class="relative my-6">
+                <div class="mt-8 relative">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
+                        <div class="w-full border-t border-gray-100"></div>
                     </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Or continue as</span>
-                    </div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-400">Quick
+                            Demo Access</span></div>
                 </div>
 
-                <!-- Demo Roles -->
-                <div class="grid grid-cols-3 gap-3 mb-6">
-                    <button 
-                        type="button"
-                        onclick="demoLogin('admin')"
-                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
-                    >
-                        <i class="fas fa-crown mr-1"></i>Admin
+                <div class="grid grid-cols-3 gap-3 mt-6">
+                    <button onclick="demoLogin('admin')"
+                        class="py-2 px-4 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition text-center soft-hover">
+                        Admin
                     </button>
-                    <button 
-                        type="button"
-                        onclick="demoLogin('shelter')"
-                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
-                    >
-                        <i class="fas fa-home mr-1"></i>Shelter
+                    <button onclick="demoLogin('shelter')"
+                        class="py-2 px-4 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition text-center soft-hover">
+                        Shelter
                     </button>
-                    <button 
-                        type="button"
-                        onclick="demoLogin('adopter')"
-                        class="px-4 py-2 border-2 border-orange-200 rounded-lg hover:bg-orange-50 transition text-sm font-semibold text-gray-700"
-                    >
-                        <i class="fas fa-heart mr-1"></i>Adopter
+                    <button onclick="demoLogin('adopter')"
+                        class="py-2 px-4 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition text-center soft-hover">
+                        Adopter
                     </button>
                 </div>
 
-                <!-- Sign Up Link -->
-                <p class="text-center text-gray-600">
-                    Don't have an account? 
-                    <a href="register.html" class="text-orange-600 font-bold hover:text-orange-700">
-                        Create one now
-                    </a>
+                <p class="text-center mt-8 text-gray-500">
+                    New to PawMatch? <a href="register.html" class="text-orange-600 font-bold hover:underline">Create an
+                        account</a>
                 </p>
 
-                <!-- Footer -->
-                <div class="text-center mt-8 pt-6 border-t border-gray-200">
-                    <a href="index.html" class="text-gray-600 hover:text-orange-600 transition text-sm">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
-                    </a>
+                <div class="text-center mt-4">
+                    <a href="index.html" class="text-sm text-gray-400 hover:text-gray-600 transition"><i
+                            class="fas fa-arrow-left mr-1"></i> Back to Home</a>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Three.js Background Logic -->
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const icon = event.target.closest('.password-toggle').querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+        const initThree = () => {
+            const container = document.getElementById('canvas-container');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x111827, 0.005);
+
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 15;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Create Paw Texture Manually (Canvas)
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            // Draw Paw Print
+            ctx.fillStyle = '#fb923c';
+            // Main pad
+            ctx.beginPath();
+            ctx.ellipse(64, 80, 25, 20, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Toes
+            [[35, 50], [55, 35], [73, 35], [93, 50]].forEach(([x, y]) => {
+                ctx.beginPath();
+                ctx.ellipse(x, y, 9, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            const texture = new THREE.CanvasTexture(canvas);
+
+            // Particles
+            const geometry = new THREE.BufferGeometry();
+            const count = 1500;
+            const positions = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+
+            for (let i = 0; i < count * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 60;
+                if (i % 3 === 0) sizes[i / 3] = Math.random();
             }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.8,
+                map: texture, // Use paw texture
+                transparent: true,
+                alphaTest: 0.1,
+                opacity: 0.6,
+                sizeAttenuation: true,
+                color: 0xffedd5
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Animation
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                // Gentle playful movement
+                particles.rotation.y += 0.0005;
+                particles.position.y = Math.sin(Date.now() * 0.0002) * 2;
+                particles.rotation.z += 0.0002;
+
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        };
+
+        window.addEventListener('DOMContentLoaded', initThree);
+
+        function togglePassword() {
+            const input = document.getElementById('password');
+            input.type = input.type === 'password' ? 'text' : 'password';
         }
 
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const email = document.querySelector('input[type="email"]').value;
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
             const password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                alert('Please enter both email and password');
-                return;
-            }
 
-            // Send login request to backend
-            const loginData = {
-                email: email,
-                password: password
-            };
+            if (!email || !password) {
+                alert('Please fill in all fields'); return;
+            }
 
             fetch('/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(loginData)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Store user data in session storage
-                    sessionStorage.setItem('userId', data.userId);
-                    sessionStorage.setItem('userRole', data.role);
-                    sessionStorage.setItem('userName', data.username);
-                    sessionStorage.setItem('userEmail', data.email);
-                    
-                    console.log('Login successful:', data);
-                    window.location.href = 'dashboard.html';
-                } else {
-                    alert('Login failed: ' + (data.message || 'Invalid credentials'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Login error: ' + error.message);
-            });
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        sessionStorage.setItem('userId', data.userId);
+                        sessionStorage.setItem('userRole', data.role);
+                        sessionStorage.setItem('userName', data.username);
+                        window.location.href = data.role === 'ADOPTER' ? 'pets-listing.html' : 'dashboard.html';
+                    } else {
+                        alert('Login Failed: ' + data.message);
+                    }
+                }).catch(() => alert('Server connection failed. Please try again.'));
         }
 
         function demoLogin(role) {
-            let credentials = {};
-            
-            if (role === 'admin') {
-                credentials = { email: 'admin', password: 'admin@123' };
-            } else if (role === 'shelter') {
-                credentials = { email: 'shelter@example.com', password: 'Shelter@123' };
-            } else if (role === 'adopter') {
-                credentials = { email: 'adopter@example.com', password: 'Adopter@123' };
-            }
-            
-            // Simulate demo login
-            sessionStorage.setItem('userId', Math.floor(Math.random() * 1000));
-            sessionStorage.setItem('userRole', role.toUpperCase());
-            sessionStorage.setItem('userName', role === 'admin' ? 'Admin Account' : role === 'shelter' ? 'Happy Paws Shelter' : 'Demo Adopter');
-            sessionStorage.setItem('userEmail', credentials.email);
-            
-            window.location.href = 'dashboard.html';
+            const creds = {
+                'admin': { u: 'admin', p: 'admin123' }, // Default admin if exists
+                'shelter': { u: 'shelter1@paws.com', p: 'password123' },
+                'adopter': { u: 'happy@family.com', p: 'password123' }
+            };
+
+            // Auto-fill and submit for better UX (if backend has these users)
+            // Or just mock login like before if explicit request. 
+            // "Make sure everything is connected" implies REAL login.
+            // So I should try to fill form.
+            document.querySelector('input[type="email"]').value = creds[role].u;
+            document.getElementById('password').value = creds[role].p;
+            document.querySelector('form').dispatchEvent(new Event('submit'));
         }
     </script>
-
 </body>
+
 </html>

@@ -3,12 +3,14 @@ package com.petadoption;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * Main Spring Boot Application Class for Pet Adoption System
  */
 @SpringBootApplication
+@ServletComponentScan // Enable servlet component scanning for @WebServlet annotations
 public class PetAdoptionApplication extends SpringBootServletInitializer {
 
     @Override

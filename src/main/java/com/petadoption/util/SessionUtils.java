@@ -1,6 +1,6 @@
 package com.petadoption.util;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import com.petadoption.model.User;
 
 /**
@@ -20,21 +20,21 @@ import com.petadoption.model.User;
  * @version 1.0
  */
 public class SessionUtils {
-    
+
     // Session attribute keys
     public static final String USER_SESSION_KEY = "loggedInUser";
     public static final String USER_ID_KEY = "userId";
     public static final String USER_TYPE_KEY = "userType";
     public static final String SESSION_TIMEOUT_MINUTES = "sessionTimeout";
-    
+
     // Default session timeout (30 minutes)
     private static final int DEFAULT_TIMEOUT = 30;
-    
+
     /**
      * Set user in session after successful login
      * 
      * @param session HTTP session
-     * @param user authenticated user object
+     * @param user    authenticated user object
      */
     public static void setUserInSession(HttpSession session, User user) {
         if (session != null && user != null) {
@@ -44,7 +44,7 @@ public class SessionUtils {
             session.setMaxInactiveInterval(DEFAULT_TIMEOUT * 60); // Convert to seconds
         }
     }
-    
+
     /**
      * Get logged-in user from session
      * 
@@ -57,7 +57,7 @@ public class SessionUtils {
         }
         return null;
     }
-    
+
     /**
      * Get user ID from session
      * 
@@ -73,7 +73,7 @@ public class SessionUtils {
         }
         return -1;
     }
-    
+
     /**
      * Get user type from session
      * 
@@ -86,7 +86,7 @@ public class SessionUtils {
         }
         return null;
     }
-    
+
     /**
      * Check if user is logged in
      * 
@@ -96,11 +96,11 @@ public class SessionUtils {
     public static boolean isUserLoggedIn(HttpSession session) {
         return session != null && session.getAttribute(USER_SESSION_KEY) != null;
     }
-    
+
     /**
      * Check if user has specific role
      * 
-     * @param session HTTP session
+     * @param session      HTTP session
      * @param requiredRole role to check (ADMIN, SHELTER, ADOPTER)
      * @return true if user has the required role
      */
@@ -111,12 +111,12 @@ public class SessionUtils {
         String userType = getUserTypeFromSession(session);
         return requiredRole != null && requiredRole.equalsIgnoreCase(userType);
     }
-    
+
     /**
      * Check if user has any of the specified roles
      * 
      * @param session HTTP session
-     * @param roles array of roles to check
+     * @param roles   array of roles to check
      * @return true if user has any of the specified roles
      */
     public static boolean hasAnyRole(HttpSession session, String... roles) {
@@ -131,7 +131,7 @@ public class SessionUtils {
         }
         return false;
     }
-    
+
     /**
      * Clear user session (logout)
      * 
@@ -144,5 +144,33 @@ public class SessionUtils {
             session.removeAttribute(USER_TYPE_KEY);
             session.invalidate();
         }
+    }
+
+    // ===== HttpServletRequest convenience methods =====
+
+    /**
+     * Check if user is logged in (accepts HttpServletRequest)
+     * 
+     * @param request HTTP request
+     * @return true if user is authenticated
+     */
+    public static boolean isUserLoggedIn(jakarta.servlet.http.HttpServletRequest request) {
+        if (request == null)
+            return false;
+        HttpSession session = request.getSession(false);
+        return isUserLoggedIn(session);
+    }
+
+    /**
+     * Get current user from request
+     * 
+     * @param request HTTP request
+     * @return User object if logged in, null otherwise
+     */
+    public static User getCurrentUser(jakarta.servlet.http.HttpServletRequest request) {
+        if (request == null)
+            return null;
+        HttpSession session = request.getSession(false);
+        return getUserFromSession(session);
     }
 }

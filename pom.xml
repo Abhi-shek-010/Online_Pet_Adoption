@@ -67,12 +67,7 @@
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
+        <!-- Jakarta Servlet API is already included in spring-boot-starter-web for Spring Boot 3.x -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

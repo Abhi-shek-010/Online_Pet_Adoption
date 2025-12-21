@@ -1,460 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PawMatch - Find Your Perfect Pet Friend</title>
+    <title>PawMatch - Find Your Best Friend</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Three.js & Tilt.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                            400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-title {
+            background: linear-gradient(to right, #ea580c, #c2410c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .float-card {
+            animation: float 6s ease-in-out infinite;
+        }
+
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .hero-bg {
-            background: linear-gradient(135deg, rgba(251, 146, 60, 0.9) 0%, rgba(249, 115, 22, 0.9) 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-bg::before {
-            content: '🐕 🐈 🐇 🦜 🐠 🐹 🐰 🦜 🐕 🐈';
-            position: absolute;
-            top: 5%;
-            left: 0;
-            width: 100%;
-            font-size: 60px;
-            opacity: 0.08;
-            animation: float 8s ease-in-out infinite;
-            white-space: nowrap;
-            pointer-events: none;
-        }
-        
-        .hero-bg::after {
-            content: '🐾 🐾 🐾 🐾 🐾 🐾 🐾 🐾';
-            position: absolute;
-            bottom: 10%;
-            right: 0;
-            font-size: 80px;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite 1s;
-            white-space: nowrap;
-            pointer-events: none;
-        }
-        
-        .pet-emoji-left {
-            position: absolute;
-            left: 10%;
-            top: 50%;
-            font-size: 100px;
-            opacity: 0.1;
-            animation: float 7s ease-in-out infinite;
-            pointer-events: none;
-        }
-        
-        .pet-emoji-right {
-            position: absolute;
-            right: 5%;
-            bottom: 20%;
-            font-size: 120px;
-            opacity: 0.08;
-            animation: bounce 4s ease-in-out infinite;
-            pointer-events: none;
-        }
-        
-        .pet-card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .pet-card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(251, 146, 60, 0.3);
-        }
-        
-        .success-story {
-            animation: slideIn 0.6s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            0% {
+                transform: translateY(0px);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
             }
         }
-        
-        .search-input {
-            border: 2px solid transparent;
+
+        /* Softer Card Hover */
+        .feature-card {
             transition: all 0.3s ease;
         }
-        
-        .search-input:focus {
-            border-color: #fb923c;
-            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.4);
-        }
-        
-        .paw-print {
-            display: inline-block;
-            color: #fb923c;
-            margin: 0 4px;
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.2);
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+
+<body class="bg-gray-50 text-slate-800">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-paw text-orange-500 text-2xl"></i>
-                    <span class="text-2xl font-bold text-gray-800">PawMatch</span>
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <span class="text-2xl font-bold tracking-tight text-gray-900">PawMatch</span>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#home" class="text-gray-600 hover:text-orange-500 transition">Home</a>
-                    <a href="#pets" class="text-gray-600 hover:text-orange-500 transition">Browse Pets</a>
-                    <a href="#stories" class="text-gray-600 hover:text-orange-500 transition">Success Stories</a>
-                    <a href="#contact" class="text-gray-600 hover:text-orange-500 transition">Contact</a>
-                </div>
-                <div class="flex space-x-4">
-                    <button onclick="window.location.href='login.html'" class="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-50 transition">Login</button>
-                    <button onclick="window.location.href='register.html'" class="px-4 py-2 btn-primary text-white rounded-lg">Sign Up</button>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="font-bold text-orange-600">Home</a>
+                    <a href="pets-listing.html" class="font-medium hover:text-orange-500 transition">Find a Pet</a>
+                    <a href="stories.html" class="font-medium hover:text-orange-500 transition">Stories</a>
+                    <a href="shelters.html" class="font-medium hover:text-orange-500 transition">Shelters</a>
+                    <a href="login.html" class="font-medium hover:text-orange-500 transition">Log In</a>
+                    <a href="register.html"
+                        class="px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">Get
+                        Started</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero-bg py-32 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-center md:text-left">
-                    <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                        Find Your Perfect
-                        <span class="block text-white">Pet Friend</span>
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+                <!-- Text Content -->
+                <div data-tilt data-tilt-max="2" data-tilt-speed="1000" data-tilt-perspective="2000">
+                    <!-- Reduced Motion -->
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-orange-100/50 text-orange-700 rounded-full text-sm font-bold mb-6 border border-orange-100">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                        Over 500+ pets adopted this month
+                    </div>
+                    <h1 class="text-6xl lg:text-7xl font-extrabold leading-tight mb-6">
+                        Find your new <br>
+                        <span class="hero-title">best friend.</span>
                     </h1>
-                    <p class="text-xl text-gray-100 mb-8 leading-relaxed">
-                        Give a loving home to a pet in need. Thousands of amazing animals are waiting for their forever families.
+                    <p class="text-xl text-gray-500 mb-8 leading-relaxed max-w-lg">
+                        Connect with local shelters and find a loving companion looking for a forever home. Simple,
+                        safe, and heartwarming.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <button onclick="document.getElementById('searchSection').scrollIntoView({behavior: 'smooth'})" class="btn-primary text-white px-8 py-4 rounded-lg text-lg font-semibold">
-                            <i class="fas fa-heart mr-2"></i>Start Adopting
-                        </button>
-                        <button onclick="window.location.href='dashboard.html'" class="px-8 py-4 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-lg font-semibold transition">
-                            Learn More
-                        </button>
+                    <div class="flex gap-4">
+                        <a href="pets-listing.html"
+                            class="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl font-bold text-lg shadow-xl shadow-orange-500/30 hover:shadow-orange-500/40 hover:-translate-y-1 transition-all">
+                            Browse Pets <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <a href="#"
+                            class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-2xl font-bold text-lg hover:bg-gray-50 transition">
+                            How it Works
+                        </a>
                     </div>
                 </div>
-                <div class="text-center">
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-white rounded-3xl opacity-10 blur-3xl"></div>
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23fbbf24' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='central'%3E%3Ci class='fas fa-dog'%3E%3C/i%3E%3C/text%3E%3C/svg%3E" alt="Happy Dog" class="relative z-10 w-full max-w-md mx-auto">
+
+                <!-- Hero Images -->
+                <div class="relative">
+                    <!-- Main Image -->
+                    <div
+                        class="relative z-10 bg-white p-3 rounded-[2rem] shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500 float-card">
+                        <!-- High Quality Dog Image -->
+                        <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80"
+                            alt="Happy Dog" class="rounded-[1.5rem] w-full object-cover h-[400px]">
+
+                        <!-- Floating Card -->
+                        <div class="absolute bottom-8 -left-8 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce"
+                            style="animation-duration: 4s;">
+                            <div
+                                class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-500 text-xl">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Vaccinated</h4>
+                                <p class="text-xs text-gray-500">All health checks passed</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Elements -->
+                    <div
+                        class="absolute -top-10 -right-10 w-72 h-72 bg-gradient-to-br from-orange-200 to-red-200 rounded-full filter blur-3xl opacity-30 -z-10">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 w-72 h-72 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full filter blur-3xl opacity-30 -z-10">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Search & Filter Section -->
-    <section id="searchSection" class="py-16 bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Find a Friend</h2>
-            <div class="grid md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pet Type</label>
-                    <select class="search-input w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none">
-                        <option>All Types</option>
-                        <option>Dogs</option>
-                        <option>Cats</option>
-                        <option>Rabbits</option>
-                        <option>Birds</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Breed</label>
-                    <input type="text" placeholder="Search breed..." class="search-input w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Age Range</label>
-                    <select class="search-input w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none">
-                        <option>All Ages</option>
-                        <option>0-2 years</option>
-                        <option>2-5 years</option>
-                        <option>5+ years</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button class="btn-primary w-full text-white px-6 py-3 rounded-lg font-semibold">
-                        <i class="fas fa-search mr-2"></i>Search
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Pets Section -->
-    <section id="pets" class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">Featured Pets Looking for Homes</h2>
-                <p class="text-lg text-gray-600">Meet some amazing animals waiting for their forever families</p>
+    <!-- Features -->
+    <section class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold mb-4">Why choose PawMatch?</h2>
+                <p class="text-gray-500">We make the adoption process transparent, easy, and secure for everyone
+                    involved.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Pet Card 1 -->
-                <div class="pet-card-hover bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="bg-gradient-to-br from-amber-200 to-orange-300 h-48 flex items-center justify-center">
-                        <i class="fas fa-dog text-6xl text-white opacity-80"></i>
+                <!-- Feature 1 -->
+                <div class="feature-card p-8 rounded-3xl bg-gray-50 border border-gray-100">
+                    <div
+                        class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 text-2xl mb-6">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Max</h3>
-                        <div class="flex justify-between text-sm text-gray-600 mb-4">
-                            <span><i class="fas fa-dna text-orange-500 mr-1"></i>Golden Retriever</span>
-                            <span><i class="fas fa-calendar text-orange-500 mr-1"></i>3 years</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Friendly, energetic, and loves to play fetch. Perfect for active families!</p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Vaccinated</span>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Available</span>
-                        </div>
-                        <button class="btn-primary w-full text-white py-3 rounded-lg font-semibold transition">
-                            <i class="fas fa-heart mr-2"></i>Adopt Me
-                        </button>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">Smart Search</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Filter by breed, age, size, and compatibility to
+                        find the perfect match for your lifestyle.</p>
                 </div>
 
-                <!-- Pet Card 2 -->
-                <div class="pet-card-hover bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="bg-gradient-to-br from-pink-200 to-rose-300 h-48 flex items-center justify-center">
-                        <i class="fas fa-cat text-6xl text-white opacity-80"></i>
+                <!-- Feature 2 -->
+                <div class="feature-card p-8 rounded-3xl bg-gray-50 border border-gray-100">
+                    <div
+                        class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-2xl mb-6">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Luna</h3>
-                        <div class="flex justify-between text-sm text-gray-600 mb-4">
-                            <span><i class="fas fa-dna text-orange-500 mr-1"></i>Tabby Cat</span>
-                            <span><i class="fas fa-calendar text-orange-500 mr-1"></i>2 years</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Gentle and affectionate. Loves cuddles and playing with toys. Great apartment pet!</p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Vaccinated</span>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Available</span>
-                        </div>
-                        <button class="btn-primary w-full text-white py-3 rounded-lg font-semibold transition">
-                            <i class="fas fa-heart mr-2"></i>Adopt Me
-                        </button>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">Verified Shelters</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">We partner directly with registered shelters and
+                        rescues to ensure every pet is legitimate.</p>
                 </div>
 
-                <!-- Pet Card 3 -->
-                <div class="pet-card-hover bg-white rounded-2xl overflow-hidden shadow-md">
-                    <div class="bg-gradient-to-br from-yellow-200 to-yellow-400 h-48 flex items-center justify-center">
-                        <i class="fas fa-feather text-6xl text-white opacity-80"></i>
+                <!-- Feature 3 -->
+                <div class="feature-card p-8 rounded-3xl bg-gray-50 border border-gray-100">
+                    <div
+                        class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 text-2xl mb-6">
+                        <i class="fas fa-heart"></i>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Charlie</h3>
-                        <div class="flex justify-between text-sm text-gray-600 mb-4">
-                            <span><i class="fas fa-dna text-orange-500 mr-1"></i>Canary</span>
-                            <span><i class="fas fa-calendar text-orange-500 mr-1"></i>1 year</span>
-                        </div>
-                        <p class="text-gray-600 mb-4">Bright and cheerful! Beautiful singer that brings joy to any home. Low maintenance pet.</p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Healthy</span>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Available</span>
-                        </div>
-                        <button class="btn-primary w-full text-white py-3 rounded-lg font-semibold transition">
-                            <i class="fas fa-heart mr-2"></i>Adopt Me
-                        </button>
-                    </div>
+                    <h3 class="text-xl font-bold mb-3">Seamless Adoption</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Apply online, track your status, and bring your new
+                        family member home sooner.</p>
                 </div>
             </div>
-
-            <div class="text-center mt-12">
-                <button onclick="window.location.href='pets-listing.html'" class="btn-primary text-white px-8 py-4 rounded-lg text-lg font-semibold">
-                    View All Pets <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Success Stories Section -->
-    <section id="stories" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">
-                    <span class="paw-print">❤️</span> Success Stories <span class="paw-print">❤️</span>
-                </h2>
-                <p class="text-lg text-gray-600">Real families, real love, real transformations</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Story 1 -->
-                <div class="success-story bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-8 border-2 border-orange-100">
-                    <div class="flex items-center mb-4">
-                        <div class="flex">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <span class="ml-3 text-sm text-gray-600">5/5 - Verified Adoption</span>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "Max changed our lives completely! He's brought so much joy and laughter to our family. We can't imagine our home without him now. The adoption process was smooth and the team was incredibly helpful!"
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-amber-300 to-orange-400 rounded-full flex items-center justify-center text-white font-bold">JK</div>
-                        <div class="ml-4">
-                            <p class="font-semibold text-gray-800">John & Karen</p>
-                            <p class="text-sm text-gray-600">Adopted Max in June 2024</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Story 2 -->
-                <div class="success-story bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-8 border-2 border-pink-100">
-                    <div class="flex items-center mb-4">
-                        <div class="flex">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <span class="ml-3 text-sm text-gray-600">5/5 - Verified Adoption</span>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "Luna was exactly what we were looking for. She's calmed our household and brought harmony to our busy lives. Her sweet personality and loving nature are unmatched. Highly recommend PawMatch!"
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full flex items-center justify-center text-white font-bold">SM</div>
-                        <div class="ml-4">
-                            <p class="font-semibold text-gray-800">Sarah & Mike</p>
-                            <p class="text-sm text-gray-600">Adopted Luna in August 2024</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Story 3 -->
-                <div class="success-story bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-100">
-                    <div class="flex items-center mb-4">
-                        <div class="flex">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <span class="ml-3 text-sm text-gray-600">5/5 - Verified Adoption</span>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "Our family wanted to make a difference and give a home to a pet in need. Charlie has brought chirping happiness every morning. The experience was wonderful from start to finish!"
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center text-white font-bold">RP</div>
-                        <div class="ml-4">
-                            <p class="font-semibold text-gray-800">Robert & Patricia</p>
-                            <p class="text-sm text-gray-600">Adopted Charlie in July 2024</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Story 4 -->
-                <div class="success-story bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-100">
-                    <div class="flex items-center mb-4">
-                        <div class="flex">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <i class="fas fa-star text-yellow-400"></i>
-                        </div>
-                        <span class="ml-3 text-sm text-gray-600">5/5 - Verified Adoption</span>
-                    </div>
-                    <p class="text-gray-700 mb-4 italic">
-                        "The adoption process made us feel welcomed and supported every step of the way. Our new companion is thriving and so are we! PawMatch truly cares about both pets and families."
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-300 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">LT</div>
-                        <div class="ml-4">
-                            <p class="font-semibold text-gray-800">Lisa & Tom</p>
-                            <p class="text-sm text-gray-600">Adopted a pet in September 2024</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="bg-gradient-to-r from-orange-500 to-orange-600 py-16 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-4xl font-bold mb-4">Ready to Change a Pet's Life?</h2>
-            <p class="text-xl mb-8">Join thousands of happy families who have found their perfect pet match</p>
-            <button onclick="window.location.href='register.html'" class="px-8 py-4 bg-white text-orange-600 font-bold rounded-lg hover:bg-gray-100 transition">
-                Get Started Today <i class="fas fa-arrow-right ml-2"></i>
-            </button>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <h3 class="text-white font-bold mb-4 flex items-center">
-                        <i class="fas fa-paw text-orange-500 mr-2"></i>PawMatch
-                    </h3>
-                    <p class="text-sm">Finding perfect homes for pets in need since 2024.</p>
+    <footer class="bg-gray-900 text-white py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-2 mb-4 md:mb-0">
+                <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white">
+                    <i class="fas fa-paw"></i>
                 </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-orange-500 transition">Browse Pets</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition">How it Works</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition">Success Stories</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">For Partners</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-orange-500 transition">Shelters</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition">Rescues</a></li>
-                        <li><a href="#" class="hover:text-orange-500 transition">Partner Portal</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><i class="fas fa-envelope mr-2"></i><a href="mailto:hello@pawmatch.com" class="hover:text-orange-500 transition">hello@pawmatch.com</a></li>
-                        <li><i class="fas fa-phone mr-2"></i>(555) 123-4567</li>
-                        <li><i class="fas fa-map-marker-alt mr-2"></i>123 Pet Lane, USA</li>
-                    </ul>
-                </div>
+                <span class="text-xl font-bold text-white">PawMatch</span>
             </div>
-            <div class="border-t border-gray-700 pt-8 text-center text-sm">
-                <p>&copy; 2024 PawMatch. All rights reserved. | <a href="#" class="hover:text-orange-500 transition">Privacy Policy</a> | <a href="#" class="hover:text-orange-500 transition">Terms of Service</a></p>
+            <div class="text-gray-400 text-sm">
+                &copy; 2024 PawMatch. Making tails wag.
             </div>
         </div>
     </footer>
 
+    <script>
+        // Init Tilt with reduced settings
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 5,
+            speed: 400,
+            glare: false,
+            "max-glare": 0.5,
+        });
+    </script>
 </body>
+
 </html>
