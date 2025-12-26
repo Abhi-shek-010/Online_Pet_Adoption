@@ -6,6 +6,15 @@ A full-stack web application for pet adoption built with Spring Boot, Java Servl
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)
 
+## ✨ Features
+
+- **🐕 Pet Listings** - Browse 75+ pets including dogs, cats, rabbits, and birds
+- **🏠 6 Partner Shelters** - Each with their own dashboard to manage pets and applications
+- **📝 Adoption Applications** - Adopters can submit requests; shelters can approve/reject
+- **💬 Success Stories** - Testimonials from happy adopters with star ratings
+- **🔐 Role-based Access** - Admin, Shelter, and Adopter roles with different permissions
+- **📱 Responsive Design** - Modern UI with glassmorphism effects and animations
+
 ---
 
 ## 📋 Table of Contents
@@ -274,6 +283,8 @@ Once running, open your browser and navigate to:
 | **Register** | http://localhost:8080/register.html |
 | **Pet Listings** | http://localhost:8080/pets-listing.html |
 | **Dashboard** | http://localhost:8080/dashboard.html |
+| **Success Stories** | http://localhost:8080/stories.html |
+| **Shelters** | http://localhost:8080/shelters.html |
 
 ### Demo Accounts
 
@@ -322,10 +333,13 @@ Use these accounts to test the application:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/adoptions/` | Get pending applications |
-| POST | `/api/adoptions/?action=submit` | Submit application |
-| POST | `/api/adoptions/?action=approve` | Approve application |
-| POST | `/api/adoptions/?action=reject` | Reject application |
+| POST | `/api/applications` | Submit new adoption application |
+| GET | `/api/applications/my` | Get my applications (Adopter) |
+| GET | `/api/applications/shelter` | Get applications for shelter's pets |
+| PUT | `/api/applications/{id}/approve` | Approve application (Shelter) |
+| PUT | `/api/applications/{id}/reject` | Reject application (Shelter) |
+| GET | `/api/adoptions/happy-families` | Get completed adoptions for stories |
+| GET | `/api/adoptions/my-pets` | Get adopter's adopted pets |
 
 ---
 
@@ -368,7 +382,9 @@ Online_Pet_Adoption/
 │           ├── login.html                     # Login page
 │           ├── register.html                  # Registration page
 │           ├── dashboard.html                 # User dashboard
-│           └── pets-listing.html              # Pet listings
+│           ├── pets-listing.html              # Pet listings
+│           ├── stories.html                   # Success stories & testimonials
+│           └── shelters.html                  # Partner shelters showcase
 ├── pom.xml                                    # Maven dependencies
 └── README.md                                  # This file
 ```
